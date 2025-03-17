@@ -32,12 +32,13 @@ representation to be handled by a LLVM compiler, producing machine code directly
 
 The basic way to operate on G NV code is by means of external DLLs
 that are compatible with C, which is naturally interoperable wiyth G.
-We'll consider two very different languages, _Rust_ and _Python_.
+We'll consider two very different languages, _Rust_ and _Python_, altough
+this is possible on virtually any language, including _OCaml_ and _Haskell_.
 
 Rust is famous for its very good performance and intrinsic memory safety,
 as well as having many pre-packaged functionalities and existing libraries.
 Python, being a dynamically typed scripting language, is far slower
-but easier to make more sophisticated prograns.
+but easier to make more sophisticated programs. 
 
 == Rust
 
@@ -69,7 +70,23 @@ One can further specific dynamic runtime architecture, such as
 with `[arm-unknown-linux-musleabi` and the like, altough LV automatically
 does so in its internal compilation process.
 
-One can also make mixed binary files.
+When actually wrtiting down functions for LabView, use the
+`#[no_mangle]` attreibute as well to facilitate linking,
+as it forces the produced libraries to retain the precise
+function names for calling.
+
+#figure(
+ ```rust
+#[no_mangle] // Don't obfuscate function names
+
+pub extern "C" fn add_numbers(a: i32, b: i32) -> i32 {
+    return a + b;
+}
+```,
+
+  caption: "A simple external function that adds and returns a `i32`." ,
+)
+
 
 When in LV, use the _*Call Library Function Node*_ and summon the produced DLL.
 Carefully add the parameters with the proper typing in the _parameters_
@@ -78,4 +95,8 @@ menu; for example, if you selected a `i32` return type, guarantee you're using a
 
 == Python
 
+LabView naturally comes with Python support; it contains three nodes,
+an _Open/Close Python Session_ and _Python Call_ node. When placed sequentially,
+one specifies the Python version and filepath for the programs in question, and then
+one can call the functions quite easily.
 
